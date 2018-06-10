@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8"></meta>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no"></meta>
+
+<!-- Bootstrap CSS -->
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"
+	type="text/css"></link>
+<!-- js -->
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/jquery-3.1.1.min.js}"></script>
+
+<title>webSocket demo</title>
+</head>
+<body>
+	<div class="container" style="margin-top:300px;">
+		<div class="row">
+			<form>
+				<div class="form-group">
+					<label for="exampleInputEmail1">用户id</label> <input type="text"
+						class="form-control" id="userId" placeholder="请输入用户id" />
+				</div>
+				<div class="form-group">
+					<label for="exampleInputEmail1">用户名</label> <input type="text"
+						class="form-control" id="userName" placeholder="请输入用户名" />
+				</div>
+				<div class="form-group">
+					<label for="exampleInputPassword1">年龄</label> <input type="text"
+						class="form-control" id="age" placeholder="请输入数字" />
+				</div>
+				<button id="submit" type="button" class="btn btn-default">提交</button>
+			</form>
+		</div>
+		<div class="row">
+		  <div class="col-md-2">
+				<span class="text-info">收到的信息是：</span>
+			</div>
+			<div class="col-md-10">
+				<span id="info"></span>
+			</div>
+		</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+
+	//webSocket初始化为空
+	var websocket = null;
+
+	$().ready(function(){
+
+		$("#submit").click(function() {
+
+				//第一次点击提交时需要建立连接，第二次点击则只需执行提交数据
+				if (websocket == null) {
+					
+					//建立连接时传递id，用于将客户端和用户绑定
+					var userId=$("#userId").val();
+				    //判断当前浏览器是否支持WebSocket  
+				    if ('WebSocket' in window) {
+					   websocket = new WebSocket("ws://localhost:8080/websocket/coinTrade/"+userId);
+					   init();
+				   } else {
+					   alert('Not support websocket')
+				   }
+			   }
+             //提交数据
+             var userName=$("#userName").val();
+             var age=$("#age").val();
+             var data={
+            	'userId':userId,
+            	'age':age
+             }
+             var jsonText =JSON.stringify(data);
+            //添加事件监听
+             websocket.addEventListener('open', function () {
+            	 send(jsonText);
+             });
+	         
+	    });
+	});
+	
+	function init(){
+		//连接发生错误的回调方法  
+		websocket.onerror = function() {
+			console.error("webSocket连接错误")
+		};
+		//连接成功建立的回调方法  
+		websocket.onopen = function(event) {
+			console.info("webSocket连接成功")
+		}
+		//接收到消息的回调方法  
+		websocket.onmessage = function(event) {
+			console.info(event.data);
+			$("#info").text(event.data)
+		}
+		//连接关闭的回调方法  
+		websocket.onclose = function() {
+			console.info("关闭连接");
+		}
+		//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。  
+		window.onbeforeunload = function() {
+			websocket.close();
+		}
+	}
+	
+	
+	//关闭连接  
+	function closeWebSocket() {
+		websocket.close();
+	}
+	//发送消息  
+	function send(message) {
+		websocket.send(message);
+	}
+
+	
+</script>
+</html>
