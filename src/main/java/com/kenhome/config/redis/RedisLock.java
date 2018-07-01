@@ -18,13 +18,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Redis 2.6.12 开始 SET 提供的新特性
- * 命令 SET key value [EX seconds] [PX milliseconds] [NX|XX]，其中：
- * EX seconds — 以秒为单位设置 key 的过期时间；
- * PX milliseconds — 以毫秒为单位设置 key 的过期时间；
- * NX — 将key 的值设为value ，当且仅当key 不存在，等效于 SETNX。
- * XX — 将key 的值设为value ，当且仅当key 存在，等效于 SETEX。
- * 客户端执行以上的命令：
+ * Redis 2.6.12 新特性
+ * SET key value [EX seconds] [PX milliseconds] [NX|XX] ：
+ * EX seconds – 设置键 key 的过期时间，单位时秒
+ * PX milliseconds – 设置键 key 的过期时间，单位时毫秒
+ * NX – 只有键 key 不存在的时候才会设置 key 的值
+ * XX – 只有键 key 存在的时候才会设置 key 的值
  * 如果服务器返回 OK ，那么这个客户端获得锁。
  * 如果服务器返回 NIL ，那么客户端获取锁失败，可以在稍后再重试。
  *
@@ -41,17 +40,17 @@ public class RedisLock {
     private StringRedisTemplate redisTemplate;
 
     /**
-     * 将key 的值设为value ，当且仅当key 不存在，等效于 SETNX。
+     * 将key 的值设为value ，当且仅当key 不存在
      */
     public static final String NX = "NX";
 
     /**
-     * seconds — 以秒为单位设置 key 的过期时间，等效于EXPIRE key seconds
+     * seconds — 以秒为单位设置 key 的过期时间
      */
     public static final String EX = "EX";
 
     /**
-     * 调用set后的返回值
+     * set后成功的返回值
      */
     public static final String OK = "OK";
 
@@ -60,9 +59,6 @@ public class RedisLock {
      * 解锁的lua脚本
      */
     public static final String UNLOCK_LUA = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then    return redis.call(\"del\",KEYS[1]) else  return 0 end ";
-
-
-    final Random random = new Random();
 
 
     /**
