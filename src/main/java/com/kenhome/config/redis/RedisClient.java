@@ -142,7 +142,7 @@ public class RedisClient {
      * @throws Exception
      */
     public boolean setIfAbsent(String key,Object object) throws Exception{
-    	return redisTemplate.opsForValue().setIfAbsent(key, object);
+        return redisTemplate.opsForValue().setIfAbsent(key, object);
     }
     
     /**
@@ -244,8 +244,9 @@ public class RedisClient {
     public boolean expire(String key,Long num ,TimeUnit unit) throws Exception{
     	return redisTemplate.expire(key,num,unit);
     }
-    
-    
+
+
+
     
     /**
      * 发送消息

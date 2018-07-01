@@ -1,20 +1,15 @@
 package com.kenhome.config.redis;
 
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-
+import com.kenhome.config.webSocket.WebSocketServer;
+import com.kenhome.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.kenhome.config.webSocket.WebSocketServer;
-import com.kenhome.util.JsonUtils;
-
-import net.minidev.json.JSONObject;
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 /**
- * 
- * @Description:消费者  
+ * @Description:消费者
  * @author: cmk 
  * @date:   2018年6月9日 上午11:33:24
  */

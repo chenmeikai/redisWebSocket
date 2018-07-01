@@ -36,6 +36,7 @@ public class DemoServer {
 
     //接收sid
     private Long userId=null;
+    
     /**
      * 连接建立成功调用的方法*/
     @OnOpen

@@ -101,7 +101,7 @@
 		}
 		//接收到消息的回调方法  
 		websocket.onmessage = function(event) {
-			console.info(event.data);
+			console.info(event);
 			$("#info").text(event.data)
 		}
 		//连接关闭的回调方法  
