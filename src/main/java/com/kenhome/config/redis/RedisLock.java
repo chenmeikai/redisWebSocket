@@ -61,6 +61,9 @@ public class RedisLock {
     public static final String UNLOCK_LUA = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then    return redis.call(\"del\",KEYS[1]) else  return 0 end ";
 
 
+    final Random random = new Random();
+
+
     /**
      * @Description: 加锁
      * @param: lockKey:key
