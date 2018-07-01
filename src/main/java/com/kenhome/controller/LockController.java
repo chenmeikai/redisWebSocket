@@ -8,13 +8,14 @@
 package com.kenhome.controller;
 
 import com.kenhome.config.redis.RedisLock;
-import com.kenhome.service.LockService;
+import com.kenhome.service.LockTestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.UUID;
 
 /**
  * @Description:TODO
@@ -27,40 +28,36 @@ public class LockController {
 
 
     @Resource
-    private LockService lockService;
+    private LockTestService lockService;
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
+    @Autowired
+    RedisLock redisLock;
+
 
     @GetMapping("lock")
-    public String send2(String key) {
+    public String send(String key) {
 
         String result = "";
         Long timeOut = 20000L;
-        int expireTime = 5;
-        String value = "haha";
-
-        RedisLock redisLock =  new RedisLock(stringRedisTemplate,key,expireTime,timeOut);
-
+        long expireTime = 6L;
+        String value =  UUID.randomUUID().toString();
+        boolean lock =false;
         try {
-
-             redisLock =  new RedisLock(stringRedisTemplate,key,expireTime,timeOut);
-
-            if (redisLock.tryLock()) {
+            lock= redisLock.tryLock(key,value,timeOut,expireTime);
+            if (lock) {
                 result=   lockService.test(key, value);
             }else{
-                result=  "请重试";
+                result=  "超时未获得锁";
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            redisLock.unlock();
+            redisLock.unlock(key,value,lock);
         }
-
-
         return result;
-
     }
 
 }

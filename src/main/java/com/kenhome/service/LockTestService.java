@@ -5,7 +5,7 @@ package com.kenhome.service;
  * @Description:
  * @Date: 2018\7\1 0001 18:14
  */
-public interface LockService {
+public interface LockTestService {
    
     /**
      * @Description: 

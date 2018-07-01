@@ -2,10 +2,12 @@ package com.kenhome.config.redis;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
@@ -14,7 +16,6 @@ import redis.clients.jedis.JedisCluster;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 /**
  * Redis 2.6.12 开始 SET 提供的新特性
@@ -23,15 +24,20 @@ import java.util.UUID;
  * PX milliseconds — 以毫秒为单位设置 key 的过期时间；
  * NX — 将key 的值设为value ，当且仅当key 不存在，等效于 SETNX。
  * XX — 将key 的值设为value ，当且仅当key 存在，等效于 SETEX。
- * 命令 SET resource-name anystring NX EX max-lock-time 是一种在 Redis 中实现锁的简单方法。
  * 客户端执行以上的命令：
  * 如果服务器返回 OK ，那么这个客户端获得锁。
  * 如果服务器返回 NIL ，那么客户端获取锁失败，可以在稍后再重试。
+ *
+ * @author cmk
+ * @version 1.0
+ * @date 2018年7月1日
  */
+@Component
 public class RedisLock {
 
     private static Logger logger = LoggerFactory.getLogger(RedisLock.class);
 
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
     /**
@@ -49,119 +55,29 @@ public class RedisLock {
      */
     public static final String OK = "OK";
 
-    /**
-     * 默认请求锁的超时时间(ms 毫秒)
-     */
-    private static final long TIME_OUT = 5000;
-
-    /**
-     * 默认锁的有效时间(s)
-     */
-    public static final int EXPIRE = 5;
 
     /**
      * 解锁的lua脚本
      */
-    public static final String UNLOCK_LUA;
+    public static final String UNLOCK_LUA = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then    return redis.call(\"del\",KEYS[1]) else  return 0 end ";
 
-    static {
-        StringBuilder sb = new StringBuilder();
-        sb.append("if redis.call(\"get\",KEYS[1]) == ARGV[1] ");
-        sb.append("then ");
-        sb.append("    return redis.call(\"del\",KEYS[1]) ");
-        sb.append("else ");
-        sb.append("    return 0 ");
-        sb.append("end ");
-        UNLOCK_LUA = sb.toString();
-    }
-
-    /**
-     * 锁标志对应的key
-     */
-    private String lockKey;
-
-    /**
-     * 记录到日志的锁标志对应的key
-     */
-    private String lockKeyLog = "";
-
-    /**
-     * 锁对应的值
-     */
-    private String lockValue;
-
-    /**
-     * 锁的有效时间(s)
-     */
-    private int expireTime = EXPIRE;
-
-    /**
-     * 请求锁的超时时间(ms)
-     */
-    private long timeOut = TIME_OUT;
-
-    /**
-     * 锁标记
-     */
-    private volatile boolean locked = false;
 
     final Random random = new Random();
 
-    /**
-     * 使用默认的锁过期时间和请求锁的超时时间
-     * @param redisTemplate
-     * @param lockKey       锁的key（Redis的Key）
-     */
-    public RedisLock(StringRedisTemplate redisTemplate, String lockKey) {
-        this.redisTemplate = redisTemplate;
-        this.lockKey = lockKey + "_lock";
-    }
 
     /**
-     * 使用默认的请求锁的超时时间，指定锁的过期时间
-     *
-     * @param redisTemplate
-     * @param lockKey       锁的key（Redis的Key）
-     * @param expireTime    锁的过期时间(单位：秒)
+     * @Description: 加锁
+     * @param: lockKey:key
+     * @param: lockValue：key值
+     * @param: timeOut(ms) 等待超时时间
+     * @param: expireTime(s) 锁过期时间
+     * @return: boolean :是否成功获得锁
      */
-    public RedisLock(StringRedisTemplate redisTemplate, String lockKey, int expireTime) {
-        this(redisTemplate, lockKey);
-        this.expireTime = expireTime;
-    }
+    public boolean tryLock(String lockKey, String lockValue, Long timeOut, Long expireTime) {
 
-    /**
-     * 使用默认的锁的过期时间，指定请求锁的超时时间
-     *
-     * @param redisTemplate
-     * @param lockKey       锁的key（Redis的Key）
-     * @param timeOut       请求锁的超时时间(单位：毫秒)
-     */
-    public RedisLock(StringRedisTemplate redisTemplate, String lockKey, long timeOut) {
-        this(redisTemplate, lockKey);
-        this.timeOut = timeOut;
-    }
+        boolean locked = false;
+        String keyValue = lockKey + "_" + lockValue;
 
-    /**
-     * 锁的过期时间和请求锁的超时时间都是用指定的值
-     *
-     * @param redisTemplate
-     * @param lockKey       锁的key（Redis的Key）
-     * @param expireTime    锁的过期时间(单位：秒)
-     * @param timeOut       请求锁的超时时间(单位：毫秒)
-     */
-    public RedisLock(StringRedisTemplate redisTemplate, String lockKey, int expireTime, long timeOut) {
-        this(redisTemplate, lockKey, expireTime);
-        this.timeOut = timeOut;
-    }
-
-    /**
-     * 尝试获取锁 超时返回
-     *
-     * @return
-     */
-    public boolean tryLock() {
-        // 生成随机key
-        lockValue = UUID.randomUUID().toString();
         // 请求锁超时时间，纳秒
         long timeout = timeOut * 1000000;
         // 系统当前时间，纳秒
@@ -170,22 +86,22 @@ public class RedisLock {
             if (OK.equalsIgnoreCase(this.set(lockKey, lockValue, expireTime))) {
                 locked = true;
                 // 上锁成功结束请求
+                logger.info(keyValue + "上锁成功");
                 return true;
             }
-
             // 每次请求等待一段时间
-            seleep(10, 50000);
+            sleep(10, 50000);
         }
+        logger.info(keyValue + "等待锁已经超时");
         return locked;
     }
 
     /**
-     * 尝试获取锁 立即返回
-     *
-     * @return 是否成功获得锁
+     * @Description:
+     * @param: [lockKey, lockValue, expireTime(过期时间s)]
+     * @return: boolean
      */
-    public boolean lock() {
-        lockValue = UUID.randomUUID().toString();
+    public boolean lock(String lockKey, String lockValue, int expireTime) {
         //不存在则添加 且设置过期时间（单位ms）
         String result = set(lockKey, lockValue, expireTime);
         return OK.equalsIgnoreCase(result);
@@ -196,19 +112,18 @@ public class RedisLock {
      *
      * @return 是否成功获得锁
      */
-    public boolean lockBlock() {
-        lockValue = UUID.randomUUID().toString();
+    public boolean lockBlock(String lockKey, String lockValue, int timeOut, int expireTime) {
         while (true) {
             //不存在则添加 且设置过期时间（单位ms）
             String result = set(lockKey, lockValue, expireTime);
             if (OK.equalsIgnoreCase(result)) {
                 return true;
             }
-
             // 每次请求等待一段时间
-            seleep(10, 50000);
+            sleep(10, 50000);
         }
     }
+
 
     /**
      * 解锁
@@ -217,9 +132,15 @@ public class RedisLock {
      * 不使用 DEL 命令来释放锁，而是发送一个 Lua 脚本，这个脚本只在客户端传入的值和键的口令串相匹配时，才对键进行删除。
      * 这两个改动可以防止持有过期锁的客户端误删现有锁的情况出现。
      */
-    public Boolean unlock() {
+    public Boolean unlock(String lockKey, String lockValue, boolean lock) {
+
         // 只有加锁成功并且锁还有效才去释放锁
-        if (locked) {
+        if (lock) {
+
+            String keyValue = lockKey + "_" + lockValue;
+
+            logger.info(keyValue + "进行解锁");
+
             return redisTemplate.execute(new RedisCallback<Boolean>() {
                 @Override
                 public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
@@ -241,17 +162,19 @@ public class RedisLock {
                         result = (Long) ((Jedis) nativeConnection).eval(UNLOCK_LUA, keys, values);
                     }
 
-                    if (result == 0 && !StringUtils.isEmpty(lockKeyLog)) {
-                        logger.info("Redis分布式锁，解锁{}失败！解锁时间：{}", lockKeyLog, System.currentTimeMillis());
+                    if (result == 0) {
+                        logger.info("Redis分布式锁，解锁{}失败！解锁时间：{}", keyValue, System.currentTimeMillis());
+                        return false;
                     }
-
-                    locked = result == 0;
-                    return result == 1;
+                    if (result == 1) {
+                        logger.info("Redis分布式锁，解锁{}成功！解锁时间：{}", keyValue, System.currentTimeMillis());
+                        return true;
+                    }
+                    return false;
                 }
             });
         }
-
-        return true;
+        return false;
     }
 
     /**
@@ -282,8 +205,8 @@ public class RedisLock {
                     result = ((Jedis) nativeConnection).set(key, value, NX, EX, seconds);
                 }
 
-                if (!StringUtils.isEmpty(lockKeyLog) && !StringUtils.isEmpty(result)) {
-                    logger.info("获取锁{}的时间：{}", lockKeyLog, System.currentTimeMillis());
+                if (!StringUtils.isEmpty(key) && !StringUtils.isEmpty(result)) {
+                    logger.info("获取锁{}的时间：{}", key, System.currentTimeMillis());
                 }
 
                 return result;
@@ -298,7 +221,7 @@ public class RedisLock {
      * @Description: 线程等待时间
      * @author yuhao.wang
      */
-    private void seleep(long millis, int nanos) {
+    private void sleep(long millis, int nanos) {
         try {
             Thread.sleep(millis, random.nextInt(nanos));
         } catch (InterruptedException e) {
@@ -312,7 +235,7 @@ public class RedisLock {
      * @param:
      * @return: long
      */
-    public long currentTimeForRedis(){
+    public long currentTimeForRedis() {
         return redisTemplate.execute(new RedisCallback<Long>() {
             @Override
             public Long doInRedis(RedisConnection redisConnection) throws DataAccessException {
@@ -321,32 +244,6 @@ public class RedisLock {
         });
     }
 
-
-
-
-    public String getLockKeyLog() {
-        return lockKeyLog;
-    }
-
-    public void setLockKeyLog(String lockKeyLog) {
-        this.lockKeyLog = lockKeyLog;
-    }
-
-    public int getExpireTime() {
-        return expireTime;
-    }
-
-    public void setExpireTime(int expireTime) {
-        this.expireTime = expireTime;
-    }
-
-    public long getTimeOut() {
-        return timeOut;
-    }
-
-    public void setTimeOut(long timeOut) {
-        this.timeOut = timeOut;
-    }
 }
 
 
