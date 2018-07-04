@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Component("redisClient")
-@Lazy//懒加载
 public class RedisClient {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisClient.class);
@@ -284,9 +283,9 @@ public class RedisClient {
 
 
     /*
-     * @Description: 原子性操作秒杀 返回0：秒杀结束；1：抢购成功；2：抢购失败
+     * @Description: 原子性操作秒杀 返回0：秒杀结束；1：抢购成功；2：抢购失败(缺点：会阻塞，返回速度慢)
      * @auther: cmk
-     * @date: 13:43
+     * @date: 2018-7-4 13:43
      * @param: [watchKey]
      * @return: int
      */
@@ -316,7 +315,7 @@ public class RedisClient {
 
     /**
      *
-     * @Description: 乐观锁操作秒杀 返回0：秒杀结束；1：抢购成功；2：抢购失败
+     * @Description: 乐观锁操作秒杀 返回0：秒杀结束；1：抢购成功；2：抢购失败；（缺点：会返回失败，可能导致抢购人数大于商品数，最终抢购的商品数却还有剩）
      * @auther: cmk
      * @date: 18:00
      * @param: [watchKey, num]
