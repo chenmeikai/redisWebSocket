@@ -56,10 +56,12 @@ public class RedisConfig {
 		redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
 		// 设置键（key）的序列化采用StringRedisSerializer。
 		redisTemplate.setKeySerializer(new StringRedisSerializer());
-
+		redisTemplate.setEnableTransactionSupport(true);
 		redisTemplate.afterPropertiesSet();
 		return redisTemplate;
 	}
+
+
 
 	// 添加主题为one的监听
 	@Bean

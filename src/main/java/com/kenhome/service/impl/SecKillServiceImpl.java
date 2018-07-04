@@ -1,12 +1,16 @@
 package com.kenhome.service.impl;
 
+import com.kenhome.config.SpringContextHolder;
+import com.kenhome.config.redis.RedisClient;
 import com.kenhome.service.SecKillService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 /**
@@ -20,34 +24,14 @@ public class SecKillServiceImpl implements SecKillService {
     Logger logger = LoggerFactory.getLogger(SecKillServiceImpl.class);
 
     @Autowired
-    StringRedisTemplate redisTemplate;
+    RedisClient redisClient;
 
-    @Transactional(rollbackFor = Exception.class)
+
+    @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
     @Override
-    public int secKill(String watchKey) throws  Exception {
+    public int secKill(String watchKey) throws Exception {
 
-        redisTemplate.watch(watchKey);
+       return  redisClient.secKill(watchKey,-1);
 
-        String lastNumString = redisTemplate.opsForValue().get(watchKey);
-
-        int lastNum = Integer.valueOf(lastNumString);
-
-        logger.info("当前剩余数量为{}", lastNum);
-
-        if (lastNum <= 0) {
-            logger.info("已经秒杀完");
-            return 0;
-        }
-        redisTemplate.multi();
-
-        redisTemplate.opsForValue().increment(watchKey, -1);
-        List<Object> list = redisTemplate.exec();
-        if (list != null) {
-            logger.info("抢购成功，当前剩余数量为{}", lastNum);
-            return 1;
-        } else {
-            logger.info("秒杀失败");
-            return 2;
-        }
     }
 }
