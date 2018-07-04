@@ -31,7 +31,7 @@ public class SecKillServiceImpl implements SecKillService {
     @Override
     public int secKill(String watchKey) throws Exception {
 
-       return  redisClient.secKill2(watchKey,-1);
+       return  redisClient.secKill(watchKey,-1);
 
     }
 }

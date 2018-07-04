@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -22,7 +24,9 @@ public class RedisClient {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisClient.class);
 
-    private RedisTemplate<String, Object> redisTemplate = SpringContextHolder.getBean("redisTemplate");
+    @Autowired
+    @Qualifier("redisTemplate")
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 存储Object
