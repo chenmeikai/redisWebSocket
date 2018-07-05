@@ -18,6 +18,7 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.kenhome.config.SpringContextHolder;
 import com.kenhome.config.redis.RedisClient;
@@ -34,8 +35,9 @@ import com.kenhome.config.redis.RedisClient;
 public class WebSocketServer {
 
 	static Logger log = LoggerFactory.getLogger(WebSocketServer.class);
-	
-	private RedisClient redisClient =SpringContextHolder.getBean("redisClient"); ;
+
+	@Autowired
+	private RedisClient redisClient ;
 
 	// 静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
 	private static int onlineCount = 0;
