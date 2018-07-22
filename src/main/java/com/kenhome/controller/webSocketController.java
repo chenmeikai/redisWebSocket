@@ -7,8 +7,12 @@
 package com.kenhome.controller;
 
 
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**      
  * @Description:TODO  
@@ -33,6 +37,24 @@ public class webSocketController {
 		
 		return "websocket/demo";
 		
+	}
+
+
+	@GetMapping("session")
+	@ResponseBody
+	public String  session(HttpServletRequest request,String name){
+
+		request.getSession().setAttribute("name",name);
+
+		return "success";
+
+	}
+
+	@GetMapping("sessionHtml")
+	public String  sessionHtml(HttpServletRequest request,String name){
+
+		return "websocket/session";
+
 	}
 
 }
