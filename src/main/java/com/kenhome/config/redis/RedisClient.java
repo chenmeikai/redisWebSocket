@@ -284,6 +284,48 @@ public class RedisClient {
     }
 
 
+    /**
+     * @Description:  链表：左压栈
+     * @param: [key, message]
+     * @return: void
+     */
+    public void leftPush(String key, String message) {
+        redisTemplate.opsForList().leftPush(key,message);
+    }
+    /**
+     * @Description:  链表：右压栈
+     * @param: [key, message]
+     * @return: void
+     */
+    public void rightPush(String key, String message) {
+        redisTemplate.opsForList().rightPush(key,message);
+    }
+    /**
+     * @Description: 链表：左出栈
+     * @param: [key]
+     * @return: java.lang.String
+     */
+    public String leftPop(String key) {
+        return (String) redisTemplate.opsForList().leftPop(key);
+    }
+    /**
+     * @Description: 链表：右出栈
+     * @param: [key]
+     * @return: java.lang.String
+     */
+    public String rightPop(String key) {
+        return (String) redisTemplate.opsForList().rightPop(key);
+    }
+    /**
+     * @Description: 链表：阻塞右出栈
+     * @param: [key]
+     * @return: java.lang.String
+     */
+    public String rightPopBlock(String key,Long num,TimeUnit timeUnit) {
+        return (String) redisTemplate.opsForList().rightPop(key,num,timeUnit);
+    }
+
+
 
 
     /*
