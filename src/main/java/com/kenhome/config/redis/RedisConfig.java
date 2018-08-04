@@ -17,7 +17,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * 一个生产者对多个消费者，多个消费者同时消费一个消息，直至所有消费者消费完这个消息，队列才会向所有消费者推送新的消息
+ * 一个生产者对多个消费者:多个消费者同时消费一个消息，直至所有消费者消费完这个消息，队列才会向所有消费者推送新的消息
  * @author cmk
  * @version 1.0
  * @date 2018年8月4日

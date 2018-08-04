@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**      
- * @Description: 链表
+ * @Description: 双向链
  * @author: cmk 
  * @date:   2018年8月2日 下午23:26:35
  */

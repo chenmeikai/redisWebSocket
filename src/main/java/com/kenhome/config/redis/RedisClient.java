@@ -285,23 +285,23 @@ public class RedisClient {
 
 
     /**
-     * @Description:  链表：左压栈
+     * @Description:  双向链：左压栈
      * @param: [key, message]
-     * @return: void
+     * @return: 长度
      */
-    public void leftPush(String key, String message) {
-        redisTemplate.opsForList().leftPush(key,message);
+    public Long leftPush(String key, String message) {
+       return  redisTemplate.opsForList().leftPush(key,message);
     }
     /**
-     * @Description:  链表：右压栈
+     * @Description:  双向链：右压栈
      * @param: [key, message]
-     * @return: void
+     * @return: 长度
      */
-    public void rightPush(String key, String message) {
-        redisTemplate.opsForList().rightPush(key,message);
+    public Long rightPush(String key, String message) {
+       return  redisTemplate.opsForList().rightPush(key,message);
     }
     /**
-     * @Description: 链表：左出栈
+     * @Description: 双向链：左出栈
      * @param: [key]
      * @return: java.lang.String
      */
@@ -309,7 +309,7 @@ public class RedisClient {
         return (String) redisTemplate.opsForList().leftPop(key);
     }
     /**
-     * @Description: 链表：右出栈
+     * @Description: 双向链：右出栈
      * @param: [key]
      * @return: java.lang.String
      */
@@ -317,18 +317,53 @@ public class RedisClient {
         return (String) redisTemplate.opsForList().rightPop(key);
     }
     /**
-     * @Description: 链表：阻塞右出栈
+     * @Description: 双向链：阻塞左出栈
+     * @param: [key]
+     * @return: java.lang.String
+     */
+    public String leftPopBlock(String key,Long num,TimeUnit timeUnit) {
+        return (String) redisTemplate.opsForList().leftPop(key,num,timeUnit);
+    }
+    /**
+     * @Description: 双向链：阻塞右出栈
      * @param: [key]
      * @return: java.lang.String
      */
     public String rightPopBlock(String key,Long num,TimeUnit timeUnit) {
         return (String) redisTemplate.opsForList().rightPop(key,num,timeUnit);
     }
+    /**
+     * @Description: 双向链：获取长度
+     * @param: [key]
+     * @return: java.lang.String
+     */
+    public Long getListSize(String key) {
+        return  redisTemplate.opsForList().size(key);
+    }
+    
+    /**
+     * @Description: 双向链：获取list集合
+     * @param: [key, start, end] start:起始位置为0 end:传-1获取全部
+     * @return: java.util.List<Object>
+     */
+    public List<Object> getList(String key,Long start,Long end) {
+        return  redisTemplate.opsForList().range(key,start,end);
+    }
+    /**
+     * @Description: 双向链：移除object
+     * @param: [key, index, object] index:起始位置，传0移除所有object
+     * @return: java.lang.Long
+     */
+    public  Long  removeList(String key,Long index,Object object) {
+        return  redisTemplate.opsForList().remove(key,index,object);
+    }
 
 
 
 
-    /*
+
+
+    /**
      * @Description: 原子性操作秒杀 返回0：秒杀结束；1：抢购成功；2：抢购失败(缺点：会阻塞，返回速度慢)
      * @auther: cmk
      * @date: 2018-7-4 13:43
