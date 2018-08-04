@@ -30,10 +30,14 @@ public class RedisController {
 	RedisClient redisClient ;
 	
 	@GetMapping("send")
-	public Map<String,Object>  send(String channel,String message){
-		
-		redisClient.sendMessage(channel, message);
-		
+	public Map<String,Object>  send(){
+
+		String channel="one";
+
+		for(int i=0;i<100;i++){
+			redisClient.sendMessage(channel, i+"");
+		}
+
 		Map<String,Object> result =new HashMap<String, Object>();
 		
 		result.put("code", 200);

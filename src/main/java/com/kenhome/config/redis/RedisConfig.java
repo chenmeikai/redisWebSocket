@@ -16,17 +16,35 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+/**
+ * 一个生产者对多个消费者，多个消费者同时消费一个消息，直至所有消费者消费完这个消息，队列才会向所有消费者推送新的消息
+ * @author cmk
+ * @version 1.0
+ * @date 2018年8月4日
+ */
 @Configuration
 public class RedisConfig {
 
 	@Bean
 	Receiver receiver(CountDownLatch latch) {
-		return new Receiver(latch);
+		Receiver receiver =new Receiver();
+		receiver.setLatch(latch());
+		return receiver ;
 	}
-    
 	//计数1次
 	@Bean
 	CountDownLatch latch() {
+		return new CountDownLatch(1);
+	}
+
+	@Bean
+	Receiver2 receiver2(CountDownLatch latch2) {
+		Receiver2 receiver2 =new Receiver2();
+		receiver2.setLatch(latch2());
+		return receiver2 ;
+	}
+	@Bean
+	CountDownLatch latch2() {
 		return new CountDownLatch(1);
 	}
 
@@ -72,10 +90,24 @@ public class RedisConfig {
 		container.addMessageListener(listenerAdapter, new PatternTopic("one"));
 		return container;
 	}
-
 	// 监听适配器，并指定监听类执行的方法
 	@Bean
 	MessageListenerAdapter listenerAdapter(Receiver receiver) {
 		return new MessageListenerAdapter(receiver, "receiveMessage");
+	}
+
+	// 添加主题为one的监听
+	@Bean
+	RedisMessageListenerContainer container2(RedisConnectionFactory connectionFactory,
+											MessageListenerAdapter listenerAdapter2) {
+		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+		container.setConnectionFactory(connectionFactory);
+		container.addMessageListener(listenerAdapter2, new PatternTopic("one"));
+		return container;
+	}
+	// 监听适配器，并指定监听类执行的方法
+	@Bean
+	MessageListenerAdapter listenerAdapter2(Receiver2 receiver2) {
+		return new MessageListenerAdapter(receiver2, "receiveMessage2");
 	}
 }
