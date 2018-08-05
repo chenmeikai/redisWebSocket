@@ -103,7 +103,7 @@ class Receive2 implements Runnable{
     @Override
     public void run() {
 
-        System.out.println("启动1");
+        System.out.println("启动2");
 
         while (true){
 
