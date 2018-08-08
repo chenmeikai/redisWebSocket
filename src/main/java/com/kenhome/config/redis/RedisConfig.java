@@ -6,8 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.concurrent.CountDownLatch;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -24,6 +27,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 public class RedisConfig {
+
+
+	@Autowired
+	private Receiver3 receiver3;
 
 	@Bean
 	Receiver receiver(CountDownLatch latch) {
@@ -95,7 +102,6 @@ public class RedisConfig {
 	MessageListenerAdapter listenerAdapter(Receiver receiver) {
 		return new MessageListenerAdapter(receiver, "receiveMessage");
 	}
-
 	// 添加主题为one的监听
 	@Bean
 	RedisMessageListenerContainer container2(RedisConnectionFactory connectionFactory,
@@ -110,4 +116,34 @@ public class RedisConfig {
 	MessageListenerAdapter listenerAdapter2(Receiver2 receiver2) {
 		return new MessageListenerAdapter(receiver2, "receiveMessage2");
 	}
+
+
+	//另外方式
+	@Bean
+	RedisMessageListenerContainer container3(RedisConnectionFactory connectionFactory) {
+		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+		container.setConnectionFactory(connectionFactory);
+		container.addMessageListener(new MessageListener() {
+			@Override
+			public void onMessage(Message message, byte[] bytes) {
+				String text =message+"";
+				System.out.println("container获得消息");
+				receiver3.receiveMessage3(text);
+			}
+		}, new PatternTopic("container"));
+		container.addMessageListener(new MessageListener() {
+			@Override
+			public void onMessage(Message message, byte[] bytes) {
+				String text =message+"";
+				System.out.println("container2获得消息");
+				receiver3.receiveMessage3(text);
+			}
+		}, new PatternTopic("container2"));
+
+
+		return container;
+	}
+
+
+
 }

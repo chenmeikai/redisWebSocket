@@ -35,6 +35,14 @@ public class CancelOrderTask implements  Runnable {
 
             //没有订单，则重新进入循环
             if (StringUtils.isEmpty(orderJobJson)){
+
+                //没有，则可休眠一个过期时间再至下个循环，如订单自动取消时间为30min
+                try {
+                    Long cancelTimeStamp =1800000L;
+                    Thread.sleep(cancelTimeStamp);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 continue;
             }
 

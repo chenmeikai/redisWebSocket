@@ -39,12 +39,40 @@ public class RedisController {
 		}
 
 		Map<String,Object> result =new HashMap<String, Object>();
-		
+
 		result.put("code", 200);
 		result.put("desc", "success");
-		
+
 		return result;
-		
+
+	}
+
+	@GetMapping("send2")
+	public Map<String,Object>  send2(){
+
+		String channel="container";
+		for(int i=0;i<100;i++){
+			redisClient.sendMessage(channel, "container:"+i);
+		}
+		Map<String,Object> result =new HashMap<String, Object>();
+
+		result.put("code", 200);
+		result.put("desc", "success");
+		return result;
+	}
+
+	@GetMapping("send3")
+	public Map<String,Object>  send3(){
+
+		String channel="container2";
+		for(int i=0;i<100;i++){
+			redisClient.sendMessage(channel, "container2:"+i);
+		}
+		Map<String,Object> result =new HashMap<String, Object>();
+
+		result.put("code", 200);
+		result.put("desc", "success");
+		return result;
 	}
 
 }
