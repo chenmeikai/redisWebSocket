@@ -6,11 +6,11 @@ package com.kenhome.service;
  * @Date: 2018\7\1 0001 18:14
  */
 public interface LockTestService {
-   
+
     /**
-     * @Description: 
+     * @Description:
      * @param: [key, value]
      * @return: void
      */
-    public String test (String key,String value);
+    public String test(String key, String value);
 }

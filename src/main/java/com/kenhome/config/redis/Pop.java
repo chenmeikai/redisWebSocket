@@ -21,19 +21,19 @@ public class Pop implements CommandLineRunner {
     @Autowired
     private RedisClient redisClient;
 
-    private static final Logger log =LoggerFactory.getLogger(Pop.class);
+    private static final Logger log = LoggerFactory.getLogger(Pop.class);
 
 
     @Override
     public void run(String... strings) throws Exception {
 
-        Receive1 receive1 =new Receive1(redisClient);
+        Receive1 receive1 = new Receive1(redisClient);
 
-        Receive2 receive2 =new Receive2(redisClient);
+        Receive2 receive2 = new Receive2(redisClient);
 
-        Thread thread1 =new Thread(receive1);
+        Thread thread1 = new Thread(receive1);
 
-        Thread thread2 =new Thread(receive2);
+        Thread thread2 = new Thread(receive2);
 
         thread1.start();
         thread2.start();
@@ -42,12 +42,12 @@ public class Pop implements CommandLineRunner {
 }
 
 
-class Receive1 implements Runnable{
+class Receive1 implements Runnable {
 
     private RedisClient redisClient;
 
-    public  Receive1(RedisClient redisClient){
-        this.redisClient=redisClient;
+    public Receive1(RedisClient redisClient) {
+        this.redisClient = redisClient;
     }
 
     @Override
@@ -55,13 +55,13 @@ class Receive1 implements Runnable{
 
         System.out.println("启动1");
 
-        while (true){
+        while (true) {
 
-            String message =null;
+            String message = null;
 
             try {
                 //阻塞获取message
-                message = redisClient.rightPopBlock("demo",30L,TimeUnit.SECONDS);
+                message = redisClient.rightPopBlock("demo", 30L, TimeUnit.SECONDS);
 
 
             } catch (Exception e) {
@@ -77,8 +77,8 @@ class Receive1 implements Runnable{
 
 
             try {
-                System.out.println("pop获得的信息："+message+",为空则进入下个循环");
-                if(message==null){
+                System.out.println("pop获得的信息：" + message + ",为空则进入下个循环");
+                if (message == null) {
                     continue;
                 }
                 //TODO 业务处理 捕捉异常，防止跳出循环
@@ -92,12 +92,12 @@ class Receive1 implements Runnable{
 }
 
 
-class Receive2 implements Runnable{
+class Receive2 implements Runnable {
 
     private RedisClient redisClient;
 
-    public  Receive2(RedisClient redisClient){
-        this.redisClient=redisClient;
+    public Receive2(RedisClient redisClient) {
+        this.redisClient = redisClient;
     }
 
     @Override
@@ -105,13 +105,13 @@ class Receive2 implements Runnable{
 
         System.out.println("启动2");
 
-        while (true){
+        while (true) {
 
-            String message =null;
+            String message = null;
 
             try {
                 //阻塞获取message
-                message = redisClient.rightPopBlock("demo",30L,TimeUnit.SECONDS);
+                message = redisClient.rightPopBlock("demo", 30L, TimeUnit.SECONDS);
 
 
             } catch (Exception e) {
@@ -127,8 +127,8 @@ class Receive2 implements Runnable{
 
 
             try {
-                System.out.println("pop2获得的信息："+message+",为空则进入下个循环");
-                if(message==null){
+                System.out.println("pop2获得的信息：" + message + ",为空则进入下个循环");
+                if (message == null) {
                     continue;
                 }
                 //TODO 业务处理 捕捉异常，防止跳出循环

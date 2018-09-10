@@ -19,15 +19,15 @@ import javax.websocket.server.ServerEndpointConfig.Configurator;
 @Component
 public class GetHttpSessionConfig extends Configurator {
 
-    Logger log =LoggerFactory.getLogger(GetHttpSessionConfig.class);
+    Logger log = LoggerFactory.getLogger(GetHttpSessionConfig.class);
 
     @Override
     public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
         //session有可能为空
         HttpSession session = (HttpSession) request.getHttpSession();
-        if (session!=null){
-            sec.getUserProperties().put(HttpSession.class.getName(),session);
-        }else{
+        if (session != null) {
+            sec.getUserProperties().put(HttpSession.class.getName(), session);
+        } else {
             log.error("modifyHandshake 获取到null session");
         }
     }

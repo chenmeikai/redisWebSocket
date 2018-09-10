@@ -18,14 +18,14 @@ import java.util.List;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes=RunApplication.class)
+@SpringBootTest(classes = RunApplication.class)
 public class RedisTest {
 
     @Autowired
     private RedisClient redisClient;
 
     @Test
-    public void test(){
+    public void test() {
         //删除该链
         try {
             redisClient.delete("list");
@@ -34,19 +34,19 @@ public class RedisTest {
         }
 
         //从右入栈
-        for(int i=0;i<50;i++){
-           String text ="number:"+i;
-           System.out.println("list长度"+redisClient.rightPush("list",text));
-       }
+        for (int i = 0; i < 50; i++) {
+            String text = "number:" + i;
+            System.out.println("list长度" + redisClient.rightPush("list", text));
+        }
 
         System.out.println("入栈结束，查询链中内容");
 
-       List<Object> list=redisClient.getList("list",0L,-1L);
-       //从左开始遍历（对应从右入栈，先入栈先遍历出）
-       for(Object object :list){
-           String text = (String) object;
-           System.out.println("双向链内容:"+text);
-       }
+        List<Object> list = redisClient.getList("list", 0L, -1L);
+        //从左开始遍历（对应从右入栈，先入栈先遍历出）
+        for (Object object : list) {
+            String text = (String) object;
+            System.out.println("双向链内容:" + text);
+        }
 
 
     }

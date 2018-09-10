@@ -23,35 +23,35 @@ public class CancelOrderJob {
     private RedisClient redisClient;
 
     @Scheduled(cron = "0 0/1 * * * *")
-    public void cancel(){
-         Long nowLine =System.currentTimeMillis();
-         while (true){
+    public void cancel() {
+        Long nowLine = System.currentTimeMillis();
+        while (true) {
 
-             String orderJobJson = redisClient.rightPop("cancelOrder");
-             //没有订单，则跳出循环
-             if (StringUtils.isEmpty(orderJobJson)){
-                 break;
-             }
+            String orderJobJson = redisClient.rightPop("cancelOrder");
+            //没有订单，则跳出循环
+            if (StringUtils.isEmpty(orderJobJson)) {
+                break;
+            }
 
-             try {
-                 CancelOrder cancelOrder = JSON.parseObject(orderJobJson,CancelOrder.class);
-                 Long overLine =cancelOrder.getOverLine();
+            try {
+                CancelOrder cancelOrder = JSON.parseObject(orderJobJson, CancelOrder.class);
+                Long overLine = cancelOrder.getOverLine();
 
-                 //如果最旧的订单未到期，则将该订单放回list原来的位置中，并跳出循环
-                 if(nowLine < overLine){
-                     redisClient.rightPush("cancelOrder",orderJobJson);
-                     break;
-                 }
+                //如果最旧的订单未到期，则将该订单放回list原来的位置中，并跳出循环
+                if (nowLine < overLine) {
+                    redisClient.rightPush("cancelOrder", orderJobJson);
+                    break;
+                }
 
-                 //TODO 业务处理：自动取消订单 ，注意：订单的手动取消和确认付款需要在订单取消链移除该订单
+                //TODO 业务处理：自动取消订单 ，注意：订单的手动取消和确认付款需要在订单取消链移除该订单
 
-             } catch (Exception e) {
-                 //TODO 将处理异常的cancelOrder 记录下来，不能放回list中，否则会导致无限循环
-                 e.printStackTrace();
-             }
+            } catch (Exception e) {
+                //TODO 将处理异常的cancelOrder 记录下来，不能放回list中，否则会导致无限循环
+                e.printStackTrace();
+            }
 
 
-         }
+        }
 
     }
 }

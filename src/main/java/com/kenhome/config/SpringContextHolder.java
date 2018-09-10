@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SpringContextHolder implements ApplicationContextAware {
-   
-	private static ApplicationContext applicationContext;
+
+    private static ApplicationContext applicationContext;
 
     /**
      * 实现ApplicationContextAware接口的context注入函数, 将其存入静态变量.

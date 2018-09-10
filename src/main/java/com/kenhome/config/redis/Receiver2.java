@@ -9,8 +9,8 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * @Description:消费者
- * @author: cmk 
- * @date:   2018年6月9日 上午11:33:24
+ * @author: cmk
+ * @date: 2018年6月9日 上午11:33:24
  */
 public class Receiver2 {
     private static final Logger logger = LoggerFactory.getLogger(Receiver2.class);
@@ -19,10 +19,10 @@ public class Receiver2 {
 
     public void receiveMessage2(String message) {
 
-         logger.info("receiver2接收到的数据 <" + message + ">");
-        logger.info("receiver2-count <" +  latch.getCount() + ">");
+        logger.info("receiver2接收到的数据 <" + message + ">");
+        logger.info("receiver2-count <" + latch.getCount() + ">");
 
-        for (int i=0;i<200;i++){
+        for (int i = 0; i < 200; i++) {
             System.out.println("...");
         }
 
@@ -32,6 +32,7 @@ public class Receiver2 {
     public CountDownLatch getLatch() {
         return latch;
     }
+
     public void setLatch(CountDownLatch latch) {
         this.latch = latch;
     }

@@ -8,5 +8,5 @@ package com.kenhome.service;
 public interface SecKillService {
 
 
-    public int secKill(String key) throws  Exception;
+    public int secKill(String key) throws Exception;
 }

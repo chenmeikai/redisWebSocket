@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 
-@ServerEndpoint(value="/webSocket/session",configurator=GetHttpSessionConfig.class)
+@ServerEndpoint(value = "/webSocket/session", configurator = GetHttpSessionConfig.class)
 @Component
 public class SessionServer {
 
@@ -37,7 +37,7 @@ public class SessionServer {
      * 连接建立成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session,EndpointConfig config) {
+    public void onOpen(Session session, EndpointConfig config) {
         this.session = session;
         webSocketSet.add(this);
         //在线数加1
@@ -45,12 +45,12 @@ public class SessionServer {
         log.info("有新窗口开始监听: 当前在线人数为" + getOnlineCount());
 
         //获取httpSession
-        HttpSession httpSession= (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         name = (String) httpSession.getAttribute("name");
-        log.info("获得session的name属性是:{}",name);
+        log.info("获得session的name属性是:{}", name);
 
         try {
-            sendMessage(name+"连接成功");
+            sendMessage(name + "连接成功");
         } catch (IOException e) {
             log.error("webSocket IO异常");
         }

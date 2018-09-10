@@ -73,9 +73,9 @@ public class HeartServer {
 
         log.info("收到来自窗口" + this.toString() + "的信息:" + message);
 
-        boolean flag  =isCheckHeart(message);
-        if(flag==true){
-            return ;
+        boolean flag = isCheckHeart(message);
+        if (flag == true) {
+            return;
         }
         //不是心跳检测则往下执行逻辑...
 
@@ -102,16 +102,16 @@ public class HeartServer {
      * 是否是心跳检测
      */
     boolean isCheckHeart(String message) {
-        boolean flag =false;
+        boolean flag = false;
         if (heart.equals(message)) {
-            flag=true;
+            flag = true;
             try {
                 sendMessage(recall);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return flag ;
+        return flag;
     }
 
     public static synchronized int getOnlineCount() {

@@ -43,19 +43,19 @@ public class LockController {
         String result = "";
         Long timeOut = 20000L;
         long expireTime = 6L;
-        String value =  UUID.randomUUID().toString();
-        boolean lock =false;
+        String value = UUID.randomUUID().toString();
+        boolean lock = false;
         try {
-            lock= redisLock.tryLock(key,value,timeOut,expireTime);
+            lock = redisLock.tryLock(key, value, timeOut, expireTime);
             if (lock) {
-                result=   lockService.test(key, value);
-            }else{
-                result=  "超时未获得锁";
+                result = lockService.test(key, value);
+            } else {
+                result = "超时未获得锁";
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            redisLock.unlock(key,value,lock);
+            redisLock.unlock(key, value, lock);
         }
         return result;
     }

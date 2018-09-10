@@ -11,7 +11,7 @@ public class CancelOrder {
     private Long orderId;
 
     //撤销到期时间
-    private  Long overLine;
+    private Long overLine;
 
     public Long getOrderId() {
         return orderId;

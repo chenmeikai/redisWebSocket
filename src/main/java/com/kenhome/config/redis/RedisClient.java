@@ -285,21 +285,23 @@ public class RedisClient {
 
 
     /**
-     * @Description:  双向链：左压栈
+     * @Description: 双向链：左压栈
      * @param: [key, message]
      * @return: 长度
      */
     public Long leftPush(String key, String message) {
-       return  redisTemplate.opsForList().leftPush(key,message);
+        return redisTemplate.opsForList().leftPush(key, message);
     }
+
     /**
-     * @Description:  双向链：右压栈
+     * @Description: 双向链：右压栈
      * @param: [key, message]
      * @return: 长度
      */
     public Long rightPush(String key, String message) {
-       return  redisTemplate.opsForList().rightPush(key,message);
+        return redisTemplate.opsForList().rightPush(key, message);
     }
+
     /**
      * @Description: 双向链：左出栈
      * @param: [key]
@@ -308,6 +310,7 @@ public class RedisClient {
     public String leftPop(String key) {
         return (String) redisTemplate.opsForList().leftPop(key);
     }
+
     /**
      * @Description: 双向链：右出栈
      * @param: [key]
@@ -316,51 +319,51 @@ public class RedisClient {
     public String rightPop(String key) {
         return (String) redisTemplate.opsForList().rightPop(key);
     }
+
     /**
      * @Description: 双向链：阻塞左出栈
      * @param: [key]
      * @return: java.lang.String
      */
-    public String leftPopBlock(String key,Long num,TimeUnit timeUnit) {
-        return (String) redisTemplate.opsForList().leftPop(key,num,timeUnit);
+    public String leftPopBlock(String key, Long num, TimeUnit timeUnit) {
+        return (String) redisTemplate.opsForList().leftPop(key, num, timeUnit);
     }
+
     /**
      * @Description: 双向链：阻塞右出栈
      * @param: [key]
      * @return: java.lang.String
      */
-    public String rightPopBlock(String key,Long num,TimeUnit timeUnit) {
-        return (String) redisTemplate.opsForList().rightPop(key,num,timeUnit);
+    public String rightPopBlock(String key, Long num, TimeUnit timeUnit) {
+        return (String) redisTemplate.opsForList().rightPop(key, num, timeUnit);
     }
+
     /**
      * @Description: 双向链：获取长度
      * @param: [key]
      * @return: java.lang.String
      */
     public Long getListSize(String key) {
-        return  redisTemplate.opsForList().size(key);
+        return redisTemplate.opsForList().size(key);
     }
-    
+
     /**
      * @Description: 双向链：获取list集合
      * @param: [key, start, end] start:起始位置为0 end:传-1获取全部
      * @return: java.util.List<Object>
      */
-    public List<Object> getList(String key,Long start,Long end) {
-        return  redisTemplate.opsForList().range(key,start,end);
+    public List<Object> getList(String key, Long start, Long end) {
+        return redisTemplate.opsForList().range(key, start, end);
     }
+
     /**
      * @Description: 双向链：移除object
      * @param: [key, index, object] index:起始位置，传0移除所有object
      * @return: java.lang.Long
      */
-    public  Long  removeList(String key,Long index,Object object) {
-        return  redisTemplate.opsForList().remove(key,index,object);
+    public Long removeList(String key, Long index, Object object) {
+        return redisTemplate.opsForList().remove(key, index, object);
     }
-
-
-
-
 
 
     /**
@@ -395,13 +398,11 @@ public class RedisClient {
 
 
     /**
-     *
      * @Description: 乐观锁操作秒杀 返回0：秒杀结束；1：抢购成功；2：抢购失败；（缺点：会返回失败，可能导致抢购人数大于商品数，最终抢购的商品数却还有剩）
      * @auther: cmk
      * @date: 18:00
      * @param: [watchKey, num]
      * @return: int
-     *
      */
     public int secKill(String watchKey, int num) {
         try {
@@ -421,12 +422,12 @@ public class RedisClient {
                         logger.info("已经秒杀完");
                         return 0;
                     }
-                    operations.opsForValue().increment(watchKey,num);
+                    operations.opsForValue().increment(watchKey, num);
                     List<Object> result = operations.exec();
 
                     System.out.println("set:" + origin + num + " rs:" + result);
 
-                    if (result.size()>0) {
+                    if (result.size() > 0) {
                         logger.info("抢购成功，当前剩余数量为{}", origin - 1);
                         return 1;
                     } else {

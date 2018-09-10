@@ -39,25 +39,24 @@ public class SecKillController {
 
 
     @GetMapping("buy")
-    public String SecKill(String key) throws  Exception {
+    public String SecKill(String key) throws Exception {
 
-       String result ="已经被抢购完啦";
+        String result = "已经被抢购完啦";
 
-       int resultCode = secKillService.secKill(SECKILLNUM);
-       if(resultCode ==0){
-          return result;
-       }
-       if(resultCode ==1){
-           result="恭喜，抢购成功了！";
-           return  result;
-       }
-       if (resultCode ==2){
-           result="抢购失败，请重试.";
-           return  result;
-       }
+        int resultCode = secKillService.secKill(SECKILLNUM);
+        if (resultCode == 0) {
+            return result;
+        }
+        if (resultCode == 1) {
+            result = "恭喜，抢购成功了！";
+            return result;
+        }
+        if (resultCode == 2) {
+            result = "抢购失败，请重试.";
+            return result;
+        }
         return result;
     }
-
 
 
     @GetMapping("initProduct")

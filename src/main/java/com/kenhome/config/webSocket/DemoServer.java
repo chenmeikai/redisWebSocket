@@ -1,10 +1,12 @@
-/**   
- * Copyright © 2018 
- * @Package: sadf.java 
- * @author: Administrator   
- * @date: 2018年6月4日 下午10:21:16 
+/**
+ * Copyright © 2018
+ *
+ * @Package: sadf.java
+ * @author: Administrator
+ * @date: 2018年6月4日 下午10:21:16
  */
 package com.kenhome.config.webSocket;
+
 import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.websocket.OnClose;
@@ -24,8 +26,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DemoServer {
 
-    static Logger log=LoggerFactory.getLogger(DemoServer.class);
-    
+    static Logger log = LoggerFactory.getLogger(DemoServer.class);
+
     //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
     private static int onlineCount = 0;
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
@@ -35,19 +37,19 @@ public class DemoServer {
     private Session session;
 
     //接收sid
-    private Long userId=null;
-    
+    private Long userId = null;
+
     /**
      * 连接建立成功调用的方法*/
     @OnOpen
-    public void onOpen(Session session,@PathParam("userId") Long userId) {
+    public void onOpen(Session session, @PathParam("userId") Long userId) {
         this.session = session;
         webSocketSet.add(this);     //加入set中
         addOnlineCount();           //在线数加1
-        log.info("有新窗口开始监听:"+userId+",当前在线人数为" + getOnlineCount());
-        this.userId=userId;
+        log.info("有新窗口开始监听:" + userId + ",当前在线人数为" + getOnlineCount());
+        this.userId = userId;
         try {
-             sendMessage(userId+"连接成功");
+            sendMessage(userId + "连接成功");
         } catch (IOException e) {
             log.error("websocket IO异常");
         }
@@ -69,19 +71,19 @@ public class DemoServer {
      * @param message 客户端发送过来的消息*/
     @OnMessage
     public void onMessage(String message, Session session) {
-    	
-        log.info("收到来自窗口"+userId+"的信息:"+message);
-        
+
+        log.info("收到来自窗口" + userId + "的信息:" + message);
+
         try {
-			session.getBasicRemote().sendText("用户"+userId+"--"+message);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-       
+            session.getBasicRemote().sendText("用户" + userId + "--" + message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
-     * 
+     *
      * @param session
      * @param error
      */
@@ -90,7 +92,7 @@ public class DemoServer {
         log.error("发生错误");
         error.printStackTrace();
     }
-    
+
     /**
      * 实现服务器主动推送
      */
@@ -103,13 +105,13 @@ public class DemoServer {
      * 发送自定义消息
      * */
     public static void sendInfo(String message, String userId) throws IOException {
-        log.info("推送消息到窗口"+userId+"，推送内容:"+message);
+        log.info("推送消息到窗口" + userId + "，推送内容:" + message);
         for (DemoServer item : webSocketSet) {
             try {
                 //这里可以设定只推送给这个userId的，为null则全部推送
-                if(userId==null) {
+                if (userId == null) {
                     item.sendMessage(message);
-                }else if(item.userId.equals(userId)){
+                } else if (item.userId.equals(userId)) {
                     item.sendMessage(message);
                 }
             } catch (IOException e) {

@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  * @Date: 2018\8\4 0004 23:21
  */
 
-public class CancelOrderTask implements  Runnable {
+public class CancelOrderTask implements Runnable {
 
 
     private RedisClient redisClient;
@@ -28,17 +28,17 @@ public class CancelOrderTask implements  Runnable {
     @Override
     public void run() {
 
-        while (true){
+        while (true) {
 
-            String orderJobJson = redisClient.rightPopBlock("cancelOrder",10L,TimeUnit.MINUTES);
+            String orderJobJson = redisClient.rightPopBlock("cancelOrder", 10L, TimeUnit.MINUTES);
 
 
             //没有订单，则重新进入循环
-            if (StringUtils.isEmpty(orderJobJson)){
+            if (StringUtils.isEmpty(orderJobJson)) {
 
                 //没有，则可休眠一个过期时间再至下个循环，如订单自动取消时间为30min
                 try {
-                    Long cancelTimeStamp =1800000L;
+                    Long cancelTimeStamp = 1800000L;
                     Thread.sleep(cancelTimeStamp);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -48,18 +48,18 @@ public class CancelOrderTask implements  Runnable {
 
             try {
 
-                CancelOrder cancelOrder = JSON.parseObject(orderJobJson,CancelOrder.class);
+                CancelOrder cancelOrder = JSON.parseObject(orderJobJson, CancelOrder.class);
 
                 //当前时间
-                Long nowLine =System.currentTimeMillis();
+                Long nowLine = System.currentTimeMillis();
                 //到期时间
-                Long overLine =cancelOrder.getOverLine();
+                Long overLine = cancelOrder.getOverLine();
 
                 //如果最旧的订单未到期，则将该订单放回list原来的位置中，休眠相差时间，再进入下个循环
-                if(nowLine < overLine){
-                    redisClient.rightPush("cancelOrder",orderJobJson);
+                if (nowLine < overLine) {
+                    redisClient.rightPush("cancelOrder", orderJobJson);
 
-                    Long sleepTime =overLine-nowLine;
+                    Long sleepTime = overLine - nowLine;
                     try {
                         Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {

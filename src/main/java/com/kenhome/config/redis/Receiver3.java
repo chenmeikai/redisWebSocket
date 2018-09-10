@@ -9,8 +9,8 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * @Description:消费者
- * @author: cmk 
- * @date:   2018年6月9日 上午11:33:24
+ * @author: cmk
+ * @date: 2018年6月9日 上午11:33:24
  */
 
 @Component
@@ -20,12 +20,12 @@ public class Receiver3 {
 
     public void receiveMessage3(String message) {
 
-         logger.info("receiver3接收到的数据 <" + message + ">");
+        logger.info("receiver3接收到的数据 <" + message + ">");
 
-         int size=200;
+        int size = 200;
 
-        for (int i=0;i<size;i++){
-            logger.info("..."+message);
+        for (int i = 0; i < size; i++) {
+            logger.info("..." + message);
         }
 
     }
